@@ -17,7 +17,7 @@ BACKGROUND_COLOR = 222
 #     img = ndimage.imread(name, flatten=False, mode='L')
 # img = ndimage.imread('imgs/0A4Xgl79z7.jpg', flatten=False, mode='L')
 
-# img = ndimage.imread('imgs/1Mj56110gn.jpg', flatten=False, mode='L')
+img = ndimage.imread('imgs/1Mj56110gn.jpg', flatten=False, mode='L')
 
 # img = ndimage.imread('imgs/67sMWm6j1b.jpg', flatten=False, mode='L')
 
@@ -40,7 +40,7 @@ BACKGROUND_COLOR = 222
 
 # img = ndimage.imread('imgs/00BiyijyRP.jpg', flatten=False, mode='L')
 # img = ndimage.imread('imgs/2Up18CKkcQ.jpg', flatten=False, mode='L')
-# img = ndimage.imread('imgs/bkY7qXk2QW.jpg', flatten=False, mode='L')
+img = ndimage.imread('imgs/bkY7qXk2QW.jpg', flatten=False, mode='L')
 # img = ndimage.imread('imgs/Bw3XsZM7tf.jpg', flatten=False, mode='L')
 # img = ndimage.imread('imgs/bG27426eSy.jpg', flatten=False, mode='L')
 
@@ -51,7 +51,7 @@ BACKGROUND_COLOR = 222
 # img = ndimage.imread('imgs/2DSnHzCM8g.jpg', flatten=False, mode='L')
 # img = ndimage.imread('imgs/2F0nKP4sH9.jpg', flatten=False, mode='L')
 # img = ndimage.imread('imgs/2sZ1kMxc31.jpg', flatten=False, mode='L')
-img = ndimage.imread('imgs/1njg682yVu.jpg', flatten=False, mode='L')
+# img = ndimage.imread('imgs/1njg682yVu.jpg', flatten=False, mode='L')
 
 
 # img = ndimage.imread('imgs/TIYTT9peZ1.jpg', flatten=False, mode='L')

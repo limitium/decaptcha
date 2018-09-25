@@ -26,7 +26,7 @@ def is_wide(region):
     minh, minw, maxh, maxw = region.bbox
     width = maxw - minw
     height = maxh - minh
-    return width > 26
+    return width > 24
 
 
 def merge(region1, region2, image):
@@ -42,7 +42,7 @@ def merge(region1, region2, image):
 
 
 def create_new_region(image, maxh, maxw, minh, minw, title):
-    return _RegionProperties((slice(minh, maxh), slice(minw, maxw)), title, image, None, False)
+    return _RegionProperties((slice(minh, maxh), slice(minw, maxw)), title, image, image, False,'xy')
 
 
 def region_center(r):
@@ -66,7 +66,7 @@ def split(region, image):
     min_col_position = 0
     min_col_value = 999
     # 15 from is_small
-    for col in np.arange(minw + 1, maxw - 1):
+    for col in np.arange(minw + 6, maxw - 6):
         cur_col_value = 0
         for row in np.arange(minh, maxh):
             cur_col_value = cur_col_value + image[row, col]
@@ -90,33 +90,42 @@ def regionWidthSort(r):
 
 
 def optimize(raw_regions, img):
-    optimized = []
+    optimized = raw_regions[:]
+    toOptimize = raw_regions[:]
     i = 0
-    for rw_region in raw_regions:
+    for region in toOptimize:
         i += 1
-        minh, minw, maxh, maxw = rw_region.bbox
+        minh, minw, maxh, maxw = region.bbox
         width = maxw - minw
         height = maxh - minh
         print i, '- h:', height, 'w:', width
-        if is_small(rw_region):
-            # regions_copy.remove(rw_region)
-            print 'small, looking for nearest'
-            nrst = nearest(rw_region, raw_regions)
-            if nrst in optimized:
-                optimized.remove(nrst)
-            print 'merge small to nearest'
-            merged = merge(rw_region, nrst, img)
-            optimized.append(merged)
-            # if i == 2:
-            #     regions_copy.remove(rw_region)
-        elif is_wide(rw_region):
+        if is_wide(region):
             print 'huge'
-            # regions_copy.remove(rw_region)
-            for splited in split(rw_region, img):
-                optimized.append(splited)
-        else:
-            optimized.append(rw_region)
-
+            hudges = [region]
+            while len(hudges) > 0:
+                huge = hudges.pop()
+                if huge in optimized:
+                    optimized.remove(huge)
+                for splited in split(huge, img):
+                    if is_wide(splited):
+                        hudges.append(splited)
+                    else:
+                        optimized.append(splited)
+    i = 0
+    for region in toOptimize:
+        i += 1
+        minh, minw, maxh, maxw = region.bbox
+        width = maxw - minw
+        height = maxh - minh
+        print i, '- h:', height, 'w:', width
+        if is_small(region):
+            optimized.remove(region)
+            print 'small, looking for nearest'
+            nrst = nearest(region, optimized)
+            optimized.remove(nrst)
+            print 'merge small to nearest'
+            merged = merge(region, nrst, img)
+            optimized.append(merged)
     return optimized
 
 
@@ -137,7 +146,7 @@ def get_labeled_regions(img, plt):
     markers = ndi.label(local_maxi, structure=[[1, 1, 1],
                                                [1, 1, 1],
                                                [1, 1, 1]])[0]
-    labels = watershed(-distance, markers, mask=image)
+    labels = watershed(~distance, markers, mask=image)
 
     fig, axes = plt.subplots(ncols=3, nrows=3, figsize=(9, 9), sharex=True, sharey=True,
                              subplot_kw={'adjustable': 'box-forced'})
@@ -145,9 +154,9 @@ def get_labeled_regions(img, plt):
     #
     ax[0].imshow(image, cmap=plt.cm.gray, interpolation='nearest')
     ax[0].set_title('Overlapping objects')
-    ax[1].imshow(-distance, cmap=plt.cm.gray, interpolation='nearest')
+    ax[1].imshow(~distance, cmap=plt.cm.gray, interpolation='nearest')
     ax[1].set_title('Distances')
-    ax[2].imshow(labels, cmap=plt.cm.spectral, interpolation='nearest')
+    ax[2].imshow(labels, cmap=plt.cm.gray, interpolation='nearest')
     ax[2].set_title('Separated objects')
 
     # shoftimg = ndimage.interpolation.shift(img, [0, -15], cval=BACKGROUND_COLOR)
