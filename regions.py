@@ -26,7 +26,7 @@ def is_wide(region):
     minh, minw, maxh, maxw = region.bbox
     width = maxw - minw
     height = maxh - minh
-    return width > 24
+    return width > 25  # 24
 
 
 def merge(region1, region2, image):
@@ -38,11 +38,21 @@ def merge(region1, region2, image):
     maxh = max(maxh1, maxh2)
     maxw = max(maxw1, maxw2)
 
-    return create_new_region(image, maxh, maxw, minh, minw, region1.label + region2.label)
+    return create_new_region(image, maxh, maxw, minh, minw, [region1.label, region2.label],
+                             100 * region1.label + 10 * region2.label)
 
 
-def create_new_region(image, maxh, maxw, minh, minw, title):
-    return _RegionProperties((slice(minh, maxh), slice(minw, maxw)), title, image, image, False,'xy')
+def create_new_region(image, maxh, maxw, minh, minw, prevLabels, newLabel):
+    sl = (slice(minh, maxh, None), slice(minw, maxw, None))
+    for label in np.array([prevLabels]).flatten():
+        np.putmask(image[sl], image[sl] == label, newLabel)
+
+    return _RegionProperties(sl,
+                             newLabel,
+                             image,
+                             None,
+                             True,
+                             coordinates='rc')
 
 
 def region_center(r):
@@ -74,8 +84,8 @@ def split(region, image):
             min_col_value = cur_col_value
             min_col_position = col
     print "End min col", min_col_position, "val", min_col_value
-    left_region = create_new_region(image, maxh, min_col_position, minh, minw, region.label + 2)
-    right_region = create_new_region(image, maxh, maxw, minh, min_col_position, region.label + 1)
+    left_region = create_new_region(image, maxh, min_col_position, minh, minw, region.label, 20 + region.label)
+    right_region = create_new_region(image, maxh, maxw, minh, min_col_position, region.label, 30 + region.label)
     splitted = []
     # if not is_small(left_region):
     splitted.append(left_region)

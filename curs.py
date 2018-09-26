@@ -153,18 +153,6 @@ if not is_straight:
     # print "un italic"
     img = line.unitalic(img)
 
-#
-# from skimage.morphology import label
-# from skimage.measure import regionprops
-#
-# label_image = label(img < 150, connectivity=2)
-# regions = regionprops(label_image)
-# labels_size[len(regions)] += 1
-# if len(regions) < 8:
-#     print name
-#
-# print regions
-# for region in regionprops(label_image):
 labeled_regions = regions.get_labeled_regions(img, plt)
 print "total regions:",len(labeled_regions)
 plt.show()
